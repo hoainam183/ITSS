@@ -1,0 +1,1 @@
+Để chứa những hàm xử lý logic mà nhiều component có thể dùng chung
