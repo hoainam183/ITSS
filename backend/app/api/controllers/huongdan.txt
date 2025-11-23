@@ -1,0 +1,2 @@
+route gọi đến đây để xử lý logic thực tế
+ví dụ: xử lý tin nhắn, gọi service AI, tương tác DB
