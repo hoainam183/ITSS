@@ -2,37 +2,36 @@ import React, { useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import Button from "../components/Button";
 import ResultBox from "../components/ResultBox";
-
-// Định nghĩa Interface cho Kết quả Phân tích Cảm xúc
-interface EmotionAnalysisResult {
-  emotion: string;
-  percentage: string;
-  suggestion: string;
-  sampleText: string;
-}
+import {
+  analyzeEmotion,
+  type EmotionResult,
+} from "../services/emotionService";
 
 const EmotionAnalysisPage: React.FC = () => {
   const [text, setText] = useState("");
-  const [result, setResult] = useState<EmotionAnalysisResult | null>(null); 
+  const [result, setResult] = useState<EmotionResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Dữ liệu mô phỏng kết quả
-  const sampleResult: EmotionAnalysisResult = {
-    emotion: "不安 (Lo lắng)",
-    percentage: "55%",
-    suggestion: "不安な感情を認め、安心感を与える返信例：",
-    sampleText: "先生はあなたの気持ちを尊重します。最近どう感じていますか？ここは安心して気持ちを話せる場所ですよ。",
-  };
+  const handleAnalyze = async () => {
+    setLoading(true);
+    setError(null);
+    setResult(null);
 
-  const handleAnalyze = () => {
-    // Logic gọi API sẽ ở đây
-    setResult(sampleResult);
+    try {
+      const data = await analyzeEmotion(text);
+      setResult(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <MainLayout>
       <h1 className="page-title">メッセージ感情分析画面</h1>
 
-      {/* Khu vực Nhập liệu */}
       <section className="input-section">
         <h2>分析対象の入力</h2>
 
@@ -46,37 +45,47 @@ const EmotionAnalysisPage: React.FC = () => {
 
         <div className="button-row">
           <Button variant="secondary">アップロード用画面へ</Button>
-          <Button variant="primary" onClick={handleAnalyze} disabled={!text.trim()}>
-            感情を分析
+          <Button
+            variant="primary"
+            onClick={handleAnalyze}
+            disabled={!text.trim() || loading}
+          >
+            {loading ? "分析中..." : "感情を分析"}
           </Button>
         </div>
       </section>
 
-      {/* Khu vực Kết quả (Chỉ hiển thị khi có kết quả) */}
+      {error && <p className="error-text">{error}</p>}
+
       {result && (
         <section className="result-section">
-          <h2>分析結果（感情とトーンの可視化）</h2>
+          <ResultBox title="感情判定" className="emotion-box">
+            <div className="emotion-display">
+              <span className="main-emotion">{result.emotion}</span>
+              <span className="percentage-tag">
+                {typeof result.confidence === "number"
+                  ? `${(result.confidence * 100).toFixed(0)}%`
+                  : result.confidence}
+              </span>
+            </div>
+            <p className="analysis-detail">{result.explanation}</p>
+            <p className="analysis-detail">Sentiment: {result.sentiment}</p>
+          </ResultBox>
 
-          <div className="result-grid">
-            
-            <ResultBox title="感情判定" className="emotion-box">
-              <div className="emotion-display">
-                <span className="main-emotion">{result.emotion}</span>
-                <span className="percentage-tag">{result.percentage}</span>
-              </div>
-              <p className="analysis-detail">
-                詳細な感情分析グラフやトーン評価がここに視覚化されます。
-              </p>
-            </ResultBox>
-
-            <ResultBox title="教師への対応提案" className="suggestion-box">
-              <p className="suggestion-preamble">{result.suggestion}</p>
-              <div className="suggestion-text-area">
-                {result.sampleText}
-              </div>
-            </ResultBox>
-
-          </div>
+          <ResultBox title="教師への対応提案" className="suggestion-box">
+            {Array.isArray(result.suggestions) ? (
+              <ul className="suggestion-list">
+                {result.suggestions.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="suggestion-preamble">{result.suggestions}</p>
+            )}
+            <small>
+              {new Date(result.timestamp).toLocaleString("ja-JP")}
+            </small>
+          </ResultBox>
         </section>
       )}
     </MainLayout>
