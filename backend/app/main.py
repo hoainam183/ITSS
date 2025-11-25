@@ -1,19 +1,35 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from app.db.mongodb import init_db
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.api.routers import emotion, students
 from app.core.config import settings
-from app.api.routers import students
+from app.db.mongodb import init_db
+
+
 # Hàm xử lý vòng đời ứng dụng (Bật lên thì kết nối DB)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
     yield
 
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    lifespan=lifespan
+    lifespan=lifespan,
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(students.router, prefix="/students", tags=["Students"])
+app.include_router(emotion.router)
+
 
 @app.get("/")
 async def root():
