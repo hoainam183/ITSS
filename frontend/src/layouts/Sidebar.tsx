@@ -1,4 +1,5 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
 const Sidebar: React.FC = () => {
   return (
@@ -8,27 +9,43 @@ const Sidebar: React.FC = () => {
       <nav className="sidebar-nav">
         <ul>
           <li className="nav-item">
-            <a href="#">ホーム</a>
+            <NavLink to="/">ホーム</NavLink>
           </li>
+
           <li className="nav-item">
-            <a href="#">会話シミュレーション</a>
+            <NavLink to="/simulation">会話シミュレーション</NavLink>
           </li>
-          {/* Mục đang chọn được đánh dấu active */}
-          <li className="nav-item active">
-            <a href="#">メッセージ感情分析</a>
-          </li>
+
           <li className="nav-item">
-            <a href="#">学生リスト</a>
+            <NavLink
+              to="/message-analysis"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              メッセージ感情分析
+            </NavLink>
           </li>
+
           <li className="nav-item">
-            <a href="#">コミュニティ掲示板</a>
+            <NavLink to="/students">学生リスト</NavLink>
           </li>
+
           <li className="nav-item">
-            <a href="#">設定</a>
+            <NavLink
+              to="/community"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              コミュニティ掲示板
+            </NavLink>
           </li>
+
+          <li className="nav-item">
+            <NavLink to="/setting">設定</NavLink>
+          </li>
+
           <li className="nav-separator" />
+
           <li className="nav-item signout">
-            <a href="#">サインアウト</a>
+            <NavLink to="/logout">サインアウト</NavLink>
           </li>
         </ul>
       </nav>
