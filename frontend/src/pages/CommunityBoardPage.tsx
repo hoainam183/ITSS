@@ -1,11 +1,10 @@
 import React from "react";
-import MainLayout from "../layouts/MainLayout";
 import Button from "../components/Button";
 import ResultBox from "../components/ResultBox";
 
 const CommunityBoardPage: React.FC = () => {
   return (
-    <MainLayout>
+    <>
       {/* Title */}
       <h1 className="page-title">コミュニティ掲示板画面</h1>
 
@@ -18,7 +17,9 @@ const CommunityBoardPage: React.FC = () => {
           style={{ height: 45 }}
         />
 
-        <Button variant="primary" className="button-community">新規投稿を作成</Button>
+        <Button variant="primary" className="button-community">
+          新規投稿を作成
+        </Button>
       </div>
 
       {/* Topic List */}
@@ -35,7 +36,7 @@ const CommunityBoardPage: React.FC = () => {
           </div>
         </div>
       </ResultBox>
-    </MainLayout>
+    </>
   );
 };
 

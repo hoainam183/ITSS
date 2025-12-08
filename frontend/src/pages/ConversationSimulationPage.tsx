@@ -540,7 +540,7 @@ const ConversationSimulationPage: React.FC = () => {
       {/* Session History Section */}
       <div className="history-section">
         <div className="history-header">
-          <h3>📋 セッション履歴</h3>
+          <h3>セッション履歴</h3>
           <Button
             variant="secondary"
             onClick={loadHistory}
