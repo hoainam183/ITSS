@@ -68,7 +68,7 @@ const EmotionAnalysisPage: React.FC = () => {
               </span>
             </div>
             <p className="analysis-detail">{result.explanation}</p>
-            <p className="analysis-detail">Sentiment: {result.sentiment}</p>
+            <p className="analysis-detail">感情分析: {result.sentiment}</p>
           </ResultBox>
 
           <ResultBox title="教師への対応提案" className="suggestion-box">

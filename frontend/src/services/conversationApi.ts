@@ -57,15 +57,17 @@ export interface EndSessionResponse {
 // ============================================
 
 export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-    public retryable: boolean = false
-  ) {
+  public status: number;
+  public retryable: boolean;
+
+  constructor(message: string, status: number, retryable: boolean = false) {
     super(message);
     this.name = "ApiError";
+    this.status = status;
+    this.retryable = retryable;
   }
 }
+
 
 // ============================================
 // API FUNCTIONS

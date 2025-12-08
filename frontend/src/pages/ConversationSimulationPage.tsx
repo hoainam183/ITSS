@@ -275,7 +275,7 @@ const ConversationSimulationPage: React.FC = () => {
                   onChange={(e) => handleSelectScenario(e.target.value)}
                   disabled={loadingScenarios || startingSession || isSessionActive}
                 >
-                  <option value="">-- シナリオを選択してください --</option>
+                  <option value="">シナリオを選択してください --</option>
                   {scenarios.map((scenario) => (
                     <option key={scenario.id} value={scenario.id}>
                       {scenario.title}

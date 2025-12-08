@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.db.mongodb import init_db
 
 
+
 # Hàm xử lý vòng đời ứng dụng (Bật lên thì kết nối DB)
 @asynccontextmanager
 async def lifespan(app: FastAPI):

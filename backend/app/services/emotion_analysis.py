@@ -13,11 +13,11 @@ async def analyze_message(message: str, student_name: str, teacher_name: str):
     system_prompt = (
         "You are an expert in educational sentiment analysis.\n"
         "Return ONLY valid JSON with fields: emotion, confidence, sentiment, "
-        "explanation, suggestions. Reply in English."
+        "explanation, suggestions. Reply in Japanese."
     )
     user_prompt = (
         f"Student: {student_name}\nTeacher: {teacher_name}\n"
-        f'Message: "{message}"\nReturn JSON analysis in English.'
+        f'Message: "{message}"\nReturn JSON analysis in Japanese.'
     )
 
     try:
