@@ -64,6 +64,7 @@ class SimulationMessage(BaseModel):
     emotion: Optional[str] = None
     sincerity_score: Optional[int] = Field(None, alias="sincerityScore")
     appropriateness_score: Optional[int] = Field(None, alias="appropriatenessScore")
+    relevance_score: Optional[int] = Field(None, alias="relevanceScore")
 
 class ConversationSimulation(Document):
     user_id: PydanticObjectId = Field(..., alias="userId")

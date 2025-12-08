@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import emotion, students
+from app.api.routers import emotion, students, conversation
 from app.core.config import settings
 from app.db.mongodb import init_db
 
@@ -29,6 +29,7 @@ app.add_middleware(
 
 app.include_router(students.router, prefix="/students", tags=["Students"])
 app.include_router(emotion.router)
+app.include_router(conversation.router)
 
 
 @app.get("/")
