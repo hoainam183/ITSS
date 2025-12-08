@@ -14,39 +14,44 @@ const Sidebar: React.FC = () => {
 
       <nav className="sidebar-nav">
         <ul>
-          {navLinks.map(({ label, to }) => (
-            <li key={to}>
-              <NavLink
-                to={to}
-                end={to === "/"}
-                className={({ isActive }) =>
-                  isActive ? "nav-link active" : "nav-link"
-                }
-              >
-                {label}
-              </NavLink>
-            </li>
-          ))}
-          <li>
-            <a className="nav-link" href="#">
-              学生リスト
-            </a>
+          <li className="nav-item">
+            <NavLink to="/">ホーム</NavLink>
           </li>
-          <li>
-            <a className="nav-link" href="#">
+
+          <li className="nav-item">
+            <NavLink to="/simulation">会話シミュレーション</NavLink>
+          </li>
+
+          <li className="nav-item">
+            <NavLink
+              to="/message-analysis"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              メッセージ感情分析
+            </NavLink>
+          </li>
+
+          <li className="nav-item">
+            <NavLink to="/students">学生リスト</NavLink>
+          </li>
+
+          <li className="nav-item">
+            <NavLink
+              to="/community"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
               コミュニティ掲示板
-            </a>
+            </NavLink>
           </li>
-          <li>
-            <a className="nav-link" href="#">
-              設定
-            </a>
+
+          <li className="nav-item">
+            <NavLink to="/setting">設定</NavLink>
           </li>
+
           <li className="nav-separator" />
-          <li>
-            <a className="nav-link signout" href="#">
-              サインアウト
-            </a>
+
+          <li className="nav-item signout">
+            <NavLink to="/logout">サインアウト</NavLink>
           </li>
         </ul>
       </nav>
