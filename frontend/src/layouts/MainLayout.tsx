@@ -1,17 +1,13 @@
-import React, { type ReactNode } from "react"; 
-import Sidebar from "./Sidebar"; 
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Sidebar from "./Sidebar";
 
-interface MainLayoutProps {
-  children: ReactNode;
-}
-
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const MainLayout: React.FC = () => {
   return (
     <div className="app-container">
-      <Sidebar /> 
-      {/* Nội dung chính */}
+      <Sidebar />
       <main className="main-content-area">
-        {children}
+        <Outlet />
       </main>
     </div>
   );

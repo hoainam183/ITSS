@@ -1,34 +1,52 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
 const Sidebar: React.FC = () => {
+  const navLinks = [
+    { label: "ホーム", to: "/" },
+    { label: "会話シミュレーション", to: "/conversation-simulation" },
+    { label: "メッセージ感情分析", to: "/emotion-analysis" },
+  ];
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">インサイトブリッジ</div>
 
       <nav className="sidebar-nav">
         <ul>
-          <li className="nav-item">
-            <a href="#">ホーム</a>
+          {navLinks.map(({ label, to }) => (
+            <li key={to}>
+              <NavLink
+                to={to}
+                end={to === "/"}
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+              >
+                {label}
+              </NavLink>
+            </li>
+          ))}
+          <li>
+            <a className="nav-link" href="#">
+              学生リスト
+            </a>
           </li>
-          <li className="nav-item">
-            <a href="#">会話シミュレーション</a>
+          <li>
+            <a className="nav-link" href="#">
+              コミュニティ掲示板
+            </a>
           </li>
-          {/* Mục đang chọn được đánh dấu active */}
-          <li className="nav-item active">
-            <a href="#">メッセージ感情分析</a>
-          </li>
-          <li className="nav-item">
-            <a href="#">学生リスト</a>
-          </li>
-          <li className="nav-item">
-            <a href="#">コミュニティ掲示板</a>
-          </li>
-          <li className="nav-item">
-            <a href="#">設定</a>
+          <li>
+            <a className="nav-link" href="#">
+              設定
+            </a>
           </li>
           <li className="nav-separator" />
-          <li className="nav-item signout">
-            <a href="#">サインアウト</a>
+          <li>
+            <a className="nav-link signout" href="#">
+              サインアウト
+            </a>
           </li>
         </ul>
       </nav>
