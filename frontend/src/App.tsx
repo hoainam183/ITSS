@@ -1,25 +1,19 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import MainLayout from "./layouts/MainLayout";
+import ConversationSimulationPage from "./pages/ConversationSimulationPage";
 import EmotionAnalysisPage from "./pages/EmotionAnalysisPage";
-import CommunityBoardPage from "./pages/CommunityBoardPage";
+import HomePage from "./pages/HomePage";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Trang mặc định */}
-        <Route path="/" element={<EmotionAnalysisPage />} />
-
-        {/* Trang phân tích cảm xúc */}
-        <Route
-          path="/message-analysis"
-          element={<EmotionAnalysisPage />}
-        />
-
-        {/* Trang cộng đồng */}
-        <Route
-          path="/community"
-          element={<CommunityBoardPage />}
-        />
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/conversation-simulation" element={<ConversationSimulationPage />} />
+          <Route path="/emotion-analysis" element={<EmotionAnalysisPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

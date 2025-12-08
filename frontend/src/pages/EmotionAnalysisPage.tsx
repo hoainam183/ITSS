@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import MainLayout from "../layouts/MainLayout";
 import Button from "../components/Button";
 import ResultBox from "../components/ResultBox";
 import {
@@ -29,7 +28,7 @@ const EmotionAnalysisPage: React.FC = () => {
   };
 
   return (
-    <MainLayout>
+    <section>
       <h1 className="page-title">メッセージ感情分析画面</h1>
 
       <section className="input-section">
@@ -88,7 +87,7 @@ const EmotionAnalysisPage: React.FC = () => {
           </ResultBox>
         </section>
       )}
-    </MainLayout>
+    </section>
   );
 };
 

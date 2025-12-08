@@ -2,6 +2,12 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 
 const Sidebar: React.FC = () => {
+  const navLinks = [
+    { label: "ホーム", to: "/" },
+    { label: "会話シミュレーション", to: "/conversation-simulation" },
+    { label: "メッセージ感情分析", to: "/emotion-analysis" },
+  ];
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">インサイトブリッジ</div>
