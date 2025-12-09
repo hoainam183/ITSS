@@ -11,7 +11,8 @@ from app.models.education import (
 from app.models.community import (
     CommunityPost, 
     Comment, 
-    SystemSetting
+    SystemSetting,
+    Upvote
 )
 
 # Danh sách này sẽ được dùng ở db/mongodb.py
@@ -24,5 +25,6 @@ all_models = [
     MessageAnalysis,
     CommunityPost,
     Comment,
-    SystemSetting
+    SystemSetting,
+    Upvote
 ]
