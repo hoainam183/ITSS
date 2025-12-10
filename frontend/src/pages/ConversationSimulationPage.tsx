@@ -439,7 +439,7 @@ const ConversationSimulationPage: React.FC = () => {
                       }`}
                     >
                       <span className="chat-meta">
-                          {turn.role === "student" ? "生徒" : "先生（あなた）"}・
+                          {turn.role === "student" ? "学生" : "先生（あなた）"}・
                         {new Date(turn.timestamp).toLocaleTimeString("ja-JP", {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -465,7 +465,7 @@ const ConversationSimulationPage: React.FC = () => {
                     {/* Typing Indicator */}
                     {sending && (
                       <div className="chat-bubble bubble-ai typing-indicator">
-                        <span className="chat-meta">生徒</span>
+                        <span className="chat-meta">学生</span>
                         <div className="typing-dots">
                           <span></span>
                           <span></span>

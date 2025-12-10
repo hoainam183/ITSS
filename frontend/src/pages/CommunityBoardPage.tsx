@@ -1,3 +1,4 @@
+import { FiThumbsUp } from "react-icons/fi";
 import React, { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -310,18 +311,18 @@ const CommunityBoardPage: React.FC = () => {
               key={post.id}
               className={`post-item ${post.isPinned ? "pinned" : ""}`}
             >
-              {/* Upvote Section */}
-              <div className="post-vote">
-                <button
-                  className={`vote-btn ${post.userHasUpvoted ? "voted" : ""}`}
-                  onClick={() => handleUpvote(post.id)}
-                  disabled={upvotingPosts.has(post.id)}
-                  title={post.userHasUpvoted ? "取り消す" : "いいね"}
-                >
-                  ▲
-                </button>
-                <span className="vote-count">{post.upvotes}</span>
-              </div>
+             {/* Like Section */}
+<div className="post-vote">
+  <button
+    className={`vote-btn ${post.userHasUpvoted ? "voted" : ""}`}
+    onClick={() => handleUpvote(post.id)}
+    disabled={upvotingPosts.has(post.id)}
+    title={post.userHasUpvoted ? "いいねを取り消す" : "いいねする"}
+  >
+    <FiThumbsUp />
+  </button>
+  <span className="vote-count">{post.upvotes}</span>
+</div>
 
               {/* Post Content */}
               <div className="post-content">

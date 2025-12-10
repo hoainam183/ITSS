@@ -1,3 +1,4 @@
+import { FiThumbsUp } from "react-icons/fi";
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
@@ -106,11 +107,13 @@ const CommentItem: React.FC<CommentItemProps> = ({
         {/* Vote */}
         <div className="comment-vote">
           <button
-            className={`vote-btn-sm ${comment.userHasUpvoted ? "voted" : ""}`}
-            onClick={() => onUpvote(comment.id)}
-          >
-            ▲
-          </button>
+  className={`vote-btn-sm ${comment.userHasUpvoted ? "voted" : ""}`}
+  onClick={() => onUpvote(comment.id)}
+  title={comment.userHasUpvoted ? "いいねを取り消す" : "いいねする"}
+>
+  <FiThumbsUp />
+</button>
+
           <span className="vote-count-sm">{comment.upvotes}</span>
         </div>
 
@@ -384,15 +387,17 @@ const PostDetailPage: React.FC = () => {
       <article className="post-detail-card">
         {/* Vote Section */}
         <div className="post-detail-vote">
-          <button
-            className={`vote-btn-lg ${post.userHasUpvoted ? "voted" : ""}`}
-            onClick={handlePostUpvote}
-            disabled={upvotingPost}
-          >
-            ▲
-          </button>
-          <span className="vote-count-lg">{post.upvotes}</span>
-        </div>
+  <button
+    className={`vote-btn-lg ${post.userHasUpvoted ? "voted" : ""}`}
+    onClick={handlePostUpvote}
+    disabled={upvotingPost}
+    title={post.userHasUpvoted ? "いいねを取り消す" : "いいねする"}
+  >
+    <FiThumbsUp />
+  </button>
+  <span className="vote-count-lg">{post.upvotes}</span>
+</div>
+
 
         {/* Content Section */}
         <div className="post-detail-content">

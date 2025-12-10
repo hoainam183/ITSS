@@ -118,12 +118,15 @@ async def get_posts(
     
     # Determine sort field
     sort_map = {
-        "newest": [("-is_pinned", -1), ("-created_at", -1)],
-        "upvotes": [("-is_pinned", -1), ("-upvotes", -1), ("-created_at", -1)],
-        "views": [("-is_pinned", -1), ("-views", -1), ("-created_at", -1)],
-        "active": [("-is_pinned", -1), ("-last_activity", -1)],
-    }
+    "newest": [("createdAt", -1)],
+    "upvotes": [("upvotes", -1), ("createdAt", -1)],
+    "views": [("views", -1), ("createdAt", -1)],
+    "active": [("last_activity", -1)],
+}
+
     sort_fields = sort_map.get(sort, sort_map["newest"])
+
+    final_sort = [("is_pinned", -1)] + sort_fields
     
     # Query with pagination
     skip = (page - 1) * limit
@@ -133,9 +136,11 @@ async def get_posts(
     total_pages = math.ceil(total / limit) if total > 0 else 1
     
     # Get posts with sorting (pinned first, then by sort criteria)
-    posts = await CommunityPost.find(filters).sort(
-        [("-is_pinned", -1)] + [(f[0].replace("-", ""), -1 if f[0].startswith("-") else 1) for f in sort_fields[1:]]
-    ).skip(skip).limit(limit).to_list()
+    posts = await CommunityPost.find(filters) \
+    .sort(final_sort) \
+    .skip(skip) \
+    .limit(limit) \
+    .to_list()
     
     # Get user's upvotes for these posts
     post_ids = [post.id for post in posts]
