@@ -34,23 +34,23 @@ const lateRouteKeywords: Record<LateRoute, string[]> = {
 const lateRouteReplies: Record<LateRoute, EvaluationResult[]> = {
   supportive: [
     {
-      aiReply: "生徒: …携帯で調べてみますね…。『バスが遅れました。本当にすみません。』",
+      aiReply: "学生: …携帯で調べてみますね…。『バスが遅れました。本当にすみません。』",
       scores: { emotion: 62, sincerity: 58, relevance: 54 },
     },
     {
       aiReply:
-        "生徒: 今度はもっと早めに出られるようにします。待っていてくださってありがとうございます。",
+        "学生: 今度はもっと早めに出られるようにします。待っていてくださってありがとうございます。",
       scores: { emotion: 74, sincerity: 71, relevance: 68 },
     },
   ],
   strict: [
     {
-      aiReply: "生徒: うまく言えなくてすみません…。翻訳アプリで書いてみてもいいですか？",
+      aiReply: "学生: うまく言えなくてすみません…。翻訳アプリで書いてみてもいいですか？",
       scores: { emotion: 45, sincerity: 52, relevance: 50 },
     },
     {
       aiReply:
-        "生徒: 電車が途中で止まってしまって…本当に申し訳ありません。次はもっと早く家を出ます。",
+        "学生: 電車が途中で止まってしまって…本当に申し訳ありません。次はもっと早く家を出ます。",
       scores: { emotion: 58, sincerity: 63, relevance: 60 },
     },
   ],
@@ -59,28 +59,28 @@ const lateRouteReplies: Record<LateRoute, EvaluationResult[]> = {
 const cannotUnderstandScript: EvaluationResult[] = [
   {
     aiReply:
-      "生徒: ありがとうございます…。じゃあ、自分の言葉で説明してみます。「〜てから」は時間の順番…という感じですか？",
+      "学生: ありがとうございます…。じゃあ、自分の言葉で説明してみます。「〜てから」は時間の順番…という感じですか？",
     scores: { emotion: 64, sincerity: 60, relevance: 55 },
   },
   {
     aiReply:
-      "生徒: あっ、なるほど！「シャワーを浴びてから、学校に行きます。」という言い方は自然ですか？",
+      "学生: あっ、なるほど！「シャワーを浴びてから、学校に行きます。」という言い方は自然ですか？",
     scores: { emotion: 72, sincerity: 70, relevance: 66 },
   },
   {
     aiReply:
-      "生徒: よかった…ありがとうございます先生。もう少し練習してもいいですか？他の文も言い換えてみたいです。",
+      "学生: よかった…ありがとうございます先生。もう少し練習してもいいですか？他の文も言い換えてみたいです。",
     scores: { emotion: 78, sincerity: 82, relevance: 74 },
   },
   {
     aiReply:
-      "生徒: ぜひお願いします！次の文も挑戦してみます。",
+      "学生: ぜひお願いします！次の文も挑戦してみます。",
     scores: { emotion: 85, sincerity: 88, relevance: 80 },
   },
 ];
 
 const defaultFallback: EvaluationResult = {
-  aiReply: "生徒: 話してくれてありがとう。もう少しゆっくり教えてもらえると助かります。",
+  aiReply: "学生: 話してくれてありがとう。もう少しゆっくり教えてもらえると助かります。",
   scores: { emotion: 50, sincerity: 55, relevance: 52 },
 };
 
@@ -101,9 +101,9 @@ export async function fetchConversationTopics(): Promise<ConversationTopic[]> {
       id: "late-to-class",
       title: "授業に遅刻した理由を伝える練習",
       description:
-        "ベトナム人生徒が遅刻した理由を日本人教師と共有し、表現をサポートするシナリオ",
+        "ベトナム人 学生が遅刻した理由を日本人教師と共有し、表現をサポートするシナリオ",
       initialMessage:
-        "生徒: 先生…すみません。さっき呼ばれたのに、どう言えばいいか分からなくて…。",
+        "学生: 先生…すみません。さっき呼ばれたのに、どう言えばいいか分からなくて…。",
       goals: [
         "理由を短く・丁寧に伝える練習",
         "教師が支援の言葉をかけつつヒアリングするパターンを体験",
@@ -115,7 +115,7 @@ export async function fetchConversationTopics(): Promise<ConversationTopic[]> {
       description:
         "分からない部分を率直に伝え、先生がフォローする会話パターンを練習",
       initialMessage:
-        "生徒: あの…先生、さっきのところがちょっとよく分からなくて…。迷惑じゃないですか？",
+        "学生: あの…先生、さっきのところがちょっとよく分からなくて…。迷惑じゃないですか？",
       goals: [
         "『すみません、よく分かりません』を自然に言えるようにする",
         "先生側が複数の言い換えや選択肢を提示して安心感を与える",
@@ -147,7 +147,7 @@ function handleLateToClass(topicId: string, replyText: string): EvaluationResult
     state.step = 1;
     topicStates.set(topicId, state);
     return {
-      aiReply: "生徒: …あの…えっと…言葉が出てこなくて…。",
+      aiReply: "学生: …あの…えっと…言葉が出てこなくて…。",
       scores: { emotion: 40, sincerity: 48, relevance: 42 },
     };
   }

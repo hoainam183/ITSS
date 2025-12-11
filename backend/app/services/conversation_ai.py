@@ -54,7 +54,7 @@ async def generate_student_response(
     
     # Build conversation context
     history_text = "\n".join([
-        f"{'生徒' if msg['role'] == 'student' else '先生'}: {msg['content']}"
+        f"{'学生' if msg['role'] == 'student' else '先生'}: {msg['content']}"
         for msg in conversation_history[-6:]  # Last 6 messages for context
     ])
     
@@ -72,7 +72,7 @@ async def generate_student_response(
   * 先生が優しく接してくれると、少しずつ心を開く
 
 【応答ルール】
-1. 必ず「生徒:」で始めてください
+1. 必ず「学生:」で始めてください
 2. 1〜3文程度で短く返答してください
 3. 状況に応じた感情を表現してください（緊張、感謝、困惑など）
 4. 先生の対応に応じてリアクションを変えてください：
@@ -91,7 +91,7 @@ async def generate_student_response(
 先生: {teacher_message}
 
 上記の先生のメッセージに対して、ベトナム人学生として自然に返答してください。
-「生徒:」で始めて、1〜3文で返答してください。"""
+「学生:」で始めて、1〜3文で返答してください。"""
 
     try:
         response = client.chat.completions.create(
@@ -106,9 +106,9 @@ async def generate_student_response(
         
         reply = response.choices[0].message.content.strip()
         
-        # Ensure it starts with 生徒:
-        if not reply.startswith("生徒:"):
-            reply = f"生徒: {reply}"
+        # Ensure it starts with 学生:
+        if not reply.startswith("学生:"):
+            reply = f"学生: {reply}"
         
         return reply
         
@@ -137,7 +137,7 @@ async def evaluate_teacher_response(
     
     # Build conversation context
     history_text = "\n".join([
-        f"{'生徒' if msg['role'] == 'student' else '先生'}: {msg['content']}"
+        f"{'学生' if msg['role'] == 'student' else '先生'}: {msg['content']}"
         for msg in conversation_history[-4:]  # Last 4 messages
     ])
     
@@ -146,19 +146,19 @@ async def evaluate_teacher_response(
 【評価基準】各項目は0〜100点で独立して評価します。
 
 1. 本音度 (sincerity): 0-100
-   - 生徒に対して心から向き合っているか
+   - 学生に対して心から向き合っているか
    - 表面的でなく、真摯な対応か
-   - 生徒が「この先生なら話せる」と感じられるか
+   - 学生が「この先生なら話せる」と感じられるか
 
 2. 適切さ (appropriateness): 0-100
    - 状況に合った言葉遣いか
-   - 生徒の日本語レベルに配慮しているか
+   - 学生の日本語レベルに配慮しているか
    - 威圧的でなく、安心感を与えるか
 
 3. 関連性 (relevance): 0-100
-   - 生徒の発言や状況に対して的確に応答しているか
+   - 学生の発言や状況に対して的確に応答しているか
    - 話題から逸れていないか
-   - 生徒の本当の問題に向き合っているか
+   - 学生の本当の問題に向き合っているか
 
 【出力形式】
 必ず以下のJSON形式のみで返答してください：
@@ -232,7 +232,7 @@ async def generate_session_feedback(
     
     # Build full conversation
     full_conversation = "\n".join([
-        f"{'生徒' if msg['role'] == 'student' else '先生'}: {msg['content']}"
+        f"{'学生' if msg['role'] == 'student' else '先生'}: {msg['content']}"
         for msg in conversation_history
     ])
     
@@ -286,7 +286,7 @@ async def generate_session_feedback(
             summary=feedback_data.get("summary", "セッションを完了しました。"),
             strengths=feedback_data.get("strengths", ["対話を最後まで続けました"]),
             improvements=feedback_data.get("improvements", ["より具体的な質問を心がけましょう"]),
-            suggestions=feedback_data.get("suggestions", ["生徒の気持ちに寄り添う言葉を増やしましょう"]),
+            suggestions=feedback_data.get("suggestions", ["学生の気持ちに寄り添う言葉を増やしましょう"]),
         )
         
     except json.JSONDecodeError:
@@ -295,7 +295,7 @@ async def generate_session_feedback(
             summary=f"セッションを完了しました。{len(all_scores)}回の対話を行いました。",
             strengths=["対話を最後まで続けることができました"],
             improvements=["より具体的な質問を心がけましょう"],
-            suggestions=["生徒の気持ちに寄り添う言葉を増やしましょう"],
+            suggestions=["学生の気持ちに寄り添う言葉を増やしましょう"],
         )
     except Exception as exc:
         raise HTTPException(

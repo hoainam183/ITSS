@@ -634,7 +634,7 @@ const ConversationSimulationPage: React.FC = () => {
                       >
                         <div className="history-message-header">
                           <span className="history-message-role">
-                            {msg.role === "teacher" ? "👨‍🏫 教師" : "👩‍🎓 学生"}
+                            {msg.role === "teacher" ? "教師" : "学生"}
                           </span>
                           <span className="history-message-time">
                             {new Date(msg.timestamp).toLocaleTimeString("ja-JP", {
