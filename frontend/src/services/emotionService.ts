@@ -1,5 +1,5 @@
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = `${BASE_URL}/emotion`;
 
 export interface EmotionResult {
   emotion: string;
@@ -11,7 +11,7 @@ export interface EmotionResult {
 }
 
 export async function analyzeEmotion(message: string) {
-  const response = await fetch(`${API_BASE}/emotion/analyze`, {
+  const response = await fetch(`${API_BASE}/analyze`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
