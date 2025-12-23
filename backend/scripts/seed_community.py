@@ -18,16 +18,17 @@ from datetime import datetime, timedelta
 from app.db.mongodb import init_db
 from app.models.users import User, UserProfile
 from app.models.community import CommunityPost, Comment
+from app.core.security import get_password_hash
 
 
 # ============================================
-# MOCK USER DATA
+# SEED USER DATA
 # ============================================
 
-MOCK_USER = {
+SEED_USER_DATA = {
     "username": "tanaka_sensei",
     "email": "tanaka@school.com",
-    "password": "hashed_password_here",  # In real app, hash this
+    "password": "password123",  # Will be hashed
     "role": "teacher",
     "profile": {
         "full_name": "田中先生",
@@ -132,6 +133,33 @@ SAMPLE_POSTS = [
 ]
 
 
+async def get_or_create_seed_user():
+    """Get existing user or create one for seeding"""
+    # Try to get first user in database
+    user = await User.find_one()
+    if user:
+        print(f"✅ Using existing user: {user.username} ({user.email})")
+        print(f"   User ID: {user.id}")
+        return user
+    
+    # Create new user for seeding
+    print("📝 Creating seed user...")
+    profile = UserProfile(**SEED_USER_DATA["profile"])
+    
+    new_user = User(
+        username=SEED_USER_DATA["username"],
+        email=SEED_USER_DATA["email"],
+        password=get_password_hash(SEED_USER_DATA["password"]),  # Hash password properly
+        role=SEED_USER_DATA["role"],
+        profile=profile,
+    )
+    await new_user.insert()
+    print(f"✅ Created seed user: {new_user.username} ({new_user.email})")
+    print(f"   User ID: {new_user.id}")
+    print(f"   Password: {SEED_USER_DATA['password']} (for testing)")
+    return new_user
+
+
 async def seed_community():
     """Seed community data"""
     print("🌱 Starting Community Board seed...")
@@ -139,27 +167,8 @@ async def seed_community():
     # Initialize database
     await init_db()
     
-    # Check if mock user already exists
-    existing_user = await User.find_one({"email": MOCK_USER["email"]})
-    
-    if existing_user:
-        print(f"✅ Mock user already exists: {existing_user.username} (ID: {existing_user.id})")
-        user = existing_user
-    else:
-        # Create mock user
-        user = User(
-            username=MOCK_USER["username"],
-            email=MOCK_USER["email"],
-            password=MOCK_USER["password"],
-            role=MOCK_USER["role"],
-            profile=UserProfile(**MOCK_USER["profile"]),
-        )
-        await user.insert()
-        print(f"✅ Created mock user: {user.username} (ID: {user.id})")
-    
-    # Print user ID for .env file
-    print(f"\n📝 Add this to your .env file:")
-    print(f"   MOCK_USER_ID={user.id}\n")
+    # Get or create seed user
+    user = await get_or_create_seed_user()
     
     # Check existing posts
     existing_posts = await CommunityPost.find_all().count()

@@ -15,6 +15,7 @@ class User(Document):
     username: str
     email: EmailStr
     password: str # Đã hash
+    role: str = "teacher"  # "teacher" or "admin"
     profile: UserProfile = Field(default_factory=UserProfile)
     
     # Reset password fields

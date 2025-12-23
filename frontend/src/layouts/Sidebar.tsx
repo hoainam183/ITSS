@@ -43,17 +43,6 @@ const Sidebar: React.FC = () => {
 
               <li className="nav-item">
                 <NavLink
-                  to="/students"
-                  className={({ isActive }) =>
-                    `nav-link ${isActive ? "active" : ""}`
-                  }
-                >
-                  学生リスト
-                </NavLink>
-              </li>
-
-              <li className="nav-item">
-                <NavLink
                   to="/community"
                   className={({ isActive }) =>
                     `nav-link ${isActive ? "active" : ""}`
@@ -62,19 +51,19 @@ const Sidebar: React.FC = () => {
                   コミュニティ掲示板
                 </NavLink>
               </li>
+
+              <li className="nav-item">
+                <NavLink
+                  to="/emotion-analysis"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                >
+                  メッセージ感情分析
+                </NavLink>
+              </li>
             </>
           )}
-
-          <li className="nav-item">
-            <NavLink
-              to="/emotion-analysis"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
-            >
-              メッセージ感情分析
-            </NavLink>
-          </li>
 
           <li className="nav-separator" />
 

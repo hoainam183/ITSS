@@ -28,10 +28,15 @@ function App() {
           <Route element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
             
-            {/* Public route */}
-            <Route path="/emotion-analysis" element={<EmotionAnalysisPage />} />
-            
             {/* Protected routes */}
+            <Route
+              path="/emotion-analysis"
+              element={
+                <ProtectedRoute>
+                  <EmotionAnalysisPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/conversation-simulation"
               element={
@@ -53,14 +58,6 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PostDetailPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/students"
-              element={
-                <ProtectedRoute>
-                  <div>学生リストページ（実装予定）</div>
                 </ProtectedRoute>
               }
             />

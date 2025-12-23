@@ -3,39 +3,7 @@ from datetime import datetime
 from beanie import Document, PydanticObjectId
 from pydantic import BaseModel, Field
 
-# --- Collection 2: Students ---
-class Student(Document):
-    teacher_id: PydanticObjectId = Field(..., alias="teacherId")
-    name: str
-    class_name: str = Field(..., alias="class")
-    nationality: Optional[str] = None
-    birthday: Optional[datetime] = None
-    personality: Optional[str] = None
-    interests: List[str] = []
-    learning_style: Optional[str] = Field(None, alias="learningStyle")
-    
-    created_at: datetime = Field(default_factory=datetime.now, alias="createdAt")
-    updated_at: datetime = Field(default_factory=datetime.now, alias="updatedAt")
-
-    class Settings:
-        name = "students"
-
-# --- Collection 3: Student Notes ---
-class StudentNote(Document):
-    student_id: PydanticObjectId = Field(..., alias="studentId")
-    teacher_id: PydanticObjectId = Field(..., alias="teacherId")
-    note_type: str = Field(..., alias="noteType") # "personality", "behavior", "academic"
-    content: str
-    tags: List[str] = []
-    important: bool = False
-    
-    created_at: datetime = Field(default_factory=datetime.now, alias="createdAt")
-    updated_at: datetime = Field(default_factory=datetime.now, alias="updatedAt")
-
-    class Settings:
-        name = "student_notes"
-
-# --- Collection 4: Conversation Scenarios ---
+# --- Collection 2: Conversation Scenarios ---
 class ExpectedResponse(BaseModel):
     teacher_message: str = Field(..., alias="teacherMessage")
     student_reaction: str = Field(..., alias="studentReaction")
