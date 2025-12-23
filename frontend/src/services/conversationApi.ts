@@ -3,6 +3,8 @@
  * Connects to backend /conversation endpoints
  */
 
+import { getAuthHeaders } from "./authApi";
+
 const API_BASE = "http://localhost:8000/conversation";
 
 // ============================================
@@ -78,7 +80,9 @@ export class ApiError extends Error {
  */
 export async function fetchScenarios(): Promise<Scenario[]> {
   try {
-    const response = await fetch(`${API_BASE}/scenarios`);
+    const response = await fetch(`${API_BASE}/scenarios`, {
+      headers: getAuthHeaders(),
+    });
     
     if (!response.ok) {
       throw new ApiError(
@@ -103,9 +107,7 @@ export async function startSession(scenarioId: string): Promise<StartSessionResp
   try {
     const response = await fetch(`${API_BASE}/simulation/start`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ scenarioId }),
     });
     
@@ -135,9 +137,7 @@ export async function sendReply(
   try {
     const response = await fetch(`${API_BASE}/simulation/${sessionId}/reply`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ content }),
     });
     
@@ -164,9 +164,7 @@ export async function endSession(sessionId: string): Promise<EndSessionResponse>
   try {
     const response = await fetch(`${API_BASE}/simulation/${sessionId}/end`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
     });
     
     if (!response.ok) {
@@ -229,7 +227,10 @@ export async function fetchSessionHistory(
 ): Promise<CompletedSessionsResponse> {
   try {
     const response = await fetch(
-      `${API_BASE}/history?limit=${limit}&skip=${skip}`
+      `${API_BASE}/history?limit=${limit}&skip=${skip}`,
+      {
+        headers: getAuthHeaders(),
+      }
     );
     
     if (!response.ok) {
@@ -250,7 +251,9 @@ export async function fetchSessionDetail(
   sessionId: string
 ): Promise<SessionDetail> {
   try {
-    const response = await fetch(`${API_BASE}/history/${sessionId}`);
+    const response = await fetch(`${API_BASE}/history/${sessionId}`, {
+      headers: getAuthHeaders(),
+    });
     
     if (!response.ok) {
       throw new ApiError("セッション詳細の取得に失敗しました", response.status, false);

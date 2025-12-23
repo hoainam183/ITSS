@@ -5,15 +5,15 @@ Community Board API Router
 - View count tracking
 """
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import List, Optional
 from datetime import datetime
 from beanie import PydanticObjectId
 import math
-import os
 
 from app.models.community import CommunityPost, Comment, Upvote
 from app.models.users import User
+from app.core.deps import get_current_user
 from app.schemas.community import (
     PostCreateRequest,
     PostUpdateRequest,
@@ -35,39 +35,8 @@ router = APIRouter(prefix="/community", tags=["Community Board"])
 
 
 # ============================================
-# MOCK USER (Option C: Get from seeded user)
+# HELPER FUNCTIONS
 # ============================================
-
-_cached_mock_user_id: PydanticObjectId | None = None
-
-async def get_mock_user_id() -> PydanticObjectId:
-    """Get mock user ID from seeded user or env (cached for consistency)"""
-    global _cached_mock_user_id
-    
-    # Return cached value if available
-    if _cached_mock_user_id:
-        return _cached_mock_user_id
-    
-    # Try to get from environment first
-    mock_id = os.getenv("MOCK_USER_ID")
-    if mock_id:
-        _cached_mock_user_id = PydanticObjectId(mock_id)
-        print(f"[DEBUG] Using MOCK_USER_ID from env: {_cached_mock_user_id}")
-        return _cached_mock_user_id
-    
-    # Otherwise find first user in database
-    user = await User.find_one()
-    if user:
-        _cached_mock_user_id = user.id
-        print(f"[DEBUG] Using user from DB: {_cached_mock_user_id}")
-        return _cached_mock_user_id
-    
-    # Fallback: create a default user
-    raise HTTPException(
-        status_code=500, 
-        detail="No user found. Please run seed script first."
-    )
-
 
 async def get_author_info(author_id: PydanticObjectId) -> AuthorInfo:
     """Get author info from user ID"""
@@ -93,12 +62,13 @@ async def get_posts(
     sort: str = Query("newest", description="Sort: newest, upvotes, views, active"),
     page: int = Query(1, ge=1, description="Page number"),
     limit: int = Query(10, ge=1, le=50, description="Items per page"),
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get list of posts with search, filter, pagination, and sorting.
     Pinned posts always appear first.
     """
-    current_user_id = await get_mock_user_id()
+    current_user_id = current_user.id
     
     # Build query filters
     filters = {}
@@ -181,11 +151,14 @@ async def get_posts(
 
 
 @router.get("/posts/{post_id}", response_model=PostResponse)
-async def get_post(post_id: str):
+async def get_post(
+    post_id: str,
+    current_user: User = Depends(get_current_user)
+):
     """
     Get single post detail. Increments view count.
     """
-    current_user_id = await get_mock_user_id()
+    current_user_id = current_user.id
     
     try:
         post = await CommunityPost.get(PydanticObjectId(post_id))
@@ -227,11 +200,14 @@ async def get_post(post_id: str):
 
 
 @router.post("/posts", response_model=PostResponse, status_code=201)
-async def create_post(request: PostCreateRequest):
+async def create_post(
+    request: PostCreateRequest,
+    current_user: User = Depends(get_current_user)
+):
     """
     Create a new post.
     """
-    current_user_id = await get_mock_user_id()
+    current_user_id = current_user.id
     
     # Create post
     post = CommunityPost(
@@ -268,11 +244,15 @@ async def create_post(request: PostCreateRequest):
 
 
 @router.put("/posts/{post_id}", response_model=PostResponse)
-async def update_post(post_id: str, request: PostUpdateRequest):
+async def update_post(
+    post_id: str,
+    request: PostUpdateRequest,
+    current_user: User = Depends(get_current_user)
+):
     """
     Update a post (only by author).
     """
-    current_user_id = await get_mock_user_id()
+    current_user_id = current_user.id
     
     try:
         post = await CommunityPost.get(PydanticObjectId(post_id))
@@ -326,11 +306,14 @@ async def update_post(post_id: str, request: PostUpdateRequest):
 
 
 @router.delete("/posts/{post_id}", status_code=204)
-async def delete_post(post_id: str):
+async def delete_post(
+    post_id: str,
+    current_user: User = Depends(get_current_user)
+):
     """
     Delete a post (only by author). Also deletes all comments and upvotes.
     """
-    current_user_id = await get_mock_user_id()
+    current_user_id = current_user.id
     
     try:
         post = await CommunityPost.get(PydanticObjectId(post_id))
@@ -364,11 +347,14 @@ async def delete_post(post_id: str):
 # ============================================
 
 @router.post("/posts/{post_id}/upvote", response_model=UpvoteResponse)
-async def upvote_post(post_id: str):
+async def upvote_post(
+    post_id: str,
+    current_user: User = Depends(get_current_user)
+):
     """
     Upvote a post. If already upvoted, removes the upvote (toggle).
     """
-    current_user_id = await get_mock_user_id()
+    current_user_id = current_user.id
     
     try:
         post = await CommunityPost.get(PydanticObjectId(post_id))
@@ -409,7 +395,11 @@ async def upvote_post(post_id: str):
 # ============================================
 
 @router.put("/posts/{post_id}/pin", response_model=PostResponse)
-async def pin_post(post_id: str, request: PinPostRequest):
+async def pin_post(
+    post_id: str,
+    request: PinPostRequest,
+    current_user: User = Depends(get_current_user)
+):
     """
     Pin or unpin a post (admin only - for now, anyone can do it).
     """
@@ -425,7 +415,7 @@ async def pin_post(post_id: str, request: PinPostRequest):
     post.updated_at = datetime.now()
     await post.save()
     
-    current_user_id = await get_mock_user_id()
+    current_user_id = current_user.id
     user_upvote = await Upvote.find_one({
         "userId": current_user_id,
         "targetType": "post",
@@ -533,13 +523,16 @@ async def build_comment_response(
 
 
 @router.get("/posts/{post_id}/comments", response_model=CommentListResponse)
-async def get_post_comments(post_id: str):
+async def get_post_comments(
+    post_id: str,
+    current_user: User = Depends(get_current_user)
+):
     """
     Get root comments for a post (depth=0).
     Replies are not loaded by default - use GET /comments/{id}/replies.
     Sort: oldest first.
     """
-    current_user_id = await get_mock_user_id()
+    current_user_id = current_user.id
     
     # Verify post exists
     try:
@@ -569,11 +562,14 @@ async def get_post_comments(post_id: str):
 
 
 @router.get("/comments/{comment_id}/replies", response_model=CommentListResponse)
-async def get_comment_replies(comment_id: str):
+async def get_comment_replies(
+    comment_id: str,
+    current_user: User = Depends(get_current_user)
+):
     """
     Get all replies for a comment (load all at once - YouTube style).
     """
-    current_user_id = await get_mock_user_id()
+    current_user_id = current_user.id
     
     try:
         parent_comment = await Comment.get(PydanticObjectId(comment_id))
@@ -601,13 +597,17 @@ async def get_comment_replies(comment_id: str):
 
 
 @router.post("/posts/{post_id}/comments", response_model=CommentResponse, status_code=201)
-async def create_comment(post_id: str, request: CommentCreateRequest):
+async def create_comment(
+    post_id: str,
+    request: CommentCreateRequest,
+    current_user: User = Depends(get_current_user)
+):
     """
     Create a comment on a post.
     - If parentCommentId is null: creates root comment (depth=0)
     - If parentCommentId is set: creates reply (depth=1, max 2 levels)
     """
-    current_user_id = await get_mock_user_id()
+    current_user_id = current_user.id
     
     # Verify post exists
     try:
@@ -660,11 +660,15 @@ async def create_comment(post_id: str, request: CommentCreateRequest):
 
 
 @router.put("/comments/{comment_id}", response_model=CommentResponse)
-async def update_comment(comment_id: str, request: CommentUpdateRequest):
+async def update_comment(
+    comment_id: str,
+    request: CommentUpdateRequest,
+    current_user: User = Depends(get_current_user)
+):
     """
     Update a comment (only by author).
     """
-    current_user_id = await get_mock_user_id()
+    current_user_id = current_user.id
     
     try:
         comment = await Comment.get(PydanticObjectId(comment_id))
@@ -687,12 +691,15 @@ async def update_comment(comment_id: str, request: CommentUpdateRequest):
 
 
 @router.delete("/comments/{comment_id}", status_code=204)
-async def delete_comment(comment_id: str):
+async def delete_comment(
+    comment_id: str,
+    current_user: User = Depends(get_current_user)
+):
     """
     Delete a comment (only by author).
     Also deletes all replies and updates post's comment_count.
     """
-    current_user_id = await get_mock_user_id()
+    current_user_id = current_user.id
     
     try:
         comment = await Comment.get(PydanticObjectId(comment_id))
@@ -738,11 +745,14 @@ async def delete_comment(comment_id: str):
 # ============================================
 
 @router.post("/comments/{comment_id}/upvote", response_model=UpvoteResponse)
-async def upvote_comment(comment_id: str):
+async def upvote_comment(
+    comment_id: str,
+    current_user: User = Depends(get_current_user)
+):
     """
     Upvote a comment. If already upvoted, removes the upvote (toggle).
     """
-    current_user_id = await get_mock_user_id()
+    current_user_id = current_user.id
     
     try:
         comment = await Comment.get(PydanticObjectId(comment_id))

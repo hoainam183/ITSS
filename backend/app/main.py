@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import emotion, students, conversation, community
+from app.api.routers import emotion, students, conversation, community, auth, users
 from app.core.config import settings
 from app.db.mongodb import init_db
 
@@ -28,6 +28,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Auth routes (public)
+app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+
+# User routes (protected)
+app.include_router(users.router, prefix="/users", tags=["Users"])
+
+# Other routes
 app.include_router(students.router, prefix="/students", tags=["Students"])
 app.include_router(emotion.router)
 app.include_router(conversation.router)

@@ -3,6 +3,8 @@
  * Connects to backend /community endpoints
  */
 
+import { getAuthHeaders } from "./authApi";
+
 const API_BASE = "http://localhost:8000/community";
 
 // ============================================
@@ -132,9 +134,11 @@ export async function fetchPosts(params: FetchPostsParams = {}): Promise<PostLis
   if (params.limit) searchParams.set("limit", params.limit.toString());
   
   const url = `${API_BASE}/posts?${searchParams.toString()}`;
-  
+
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) {
       throw new ApiError("投稿の取得に失敗しました", response.status, true);
     }
@@ -150,7 +154,9 @@ export async function fetchPosts(params: FetchPostsParams = {}): Promise<PostLis
  */
 export async function fetchPost(postId: string): Promise<Post> {
   try {
-    const response = await fetch(`${API_BASE}/posts/${postId}`);
+    const response = await fetch(`${API_BASE}/posts/${postId}`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) {
       throw new ApiError("投稿が見つかりません", response.status, false);
     }
@@ -172,7 +178,7 @@ export async function createPost(data: {
   try {
     const response = await fetch(`${API_BASE}/posts`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) {
@@ -200,7 +206,7 @@ export async function updatePost(
   try {
     const response = await fetch(`${API_BASE}/posts/${postId}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     if (!response.ok) {
@@ -220,6 +226,7 @@ export async function deletePost(postId: string): Promise<void> {
   try {
     const response = await fetch(`${API_BASE}/posts/${postId}`, {
       method: "DELETE",
+      headers: getAuthHeaders(),
     });
     if (!response.ok) {
       throw new ApiError("投稿の削除に失敗しました", response.status, false);
@@ -237,6 +244,7 @@ export async function togglePostUpvote(postId: string): Promise<UpvoteResponse> 
   try {
     const response = await fetch(`${API_BASE}/posts/${postId}/upvote`, {
       method: "POST",
+      headers: getAuthHeaders(),
     });
     if (!response.ok) {
       throw new ApiError("投票に失敗しました", response.status, true);
@@ -257,7 +265,9 @@ export async function togglePostUpvote(postId: string): Promise<UpvoteResponse> 
  */
 export async function fetchTags(limit: number = 20): Promise<TagInfo[]> {
   try {
-    const response = await fetch(`${API_BASE}/tags?limit=${limit}`);
+    const response = await fetch(`${API_BASE}/tags?limit=${limit}`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) {
       throw new ApiError("タグの取得に失敗しました", response.status, true);
     }
@@ -278,7 +288,9 @@ export async function fetchTags(limit: number = 20): Promise<TagInfo[]> {
  */
 export async function fetchComments(postId: string): Promise<CommentListResponse> {
   try {
-    const response = await fetch(`${API_BASE}/posts/${postId}/comments`);
+    const response = await fetch(`${API_BASE}/posts/${postId}/comments`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) {
       throw new ApiError("コメントの取得に失敗しました", response.status, true);
     }
@@ -294,7 +306,9 @@ export async function fetchComments(postId: string): Promise<CommentListResponse
  */
 export async function fetchReplies(commentId: string): Promise<CommentListResponse> {
   try {
-    const response = await fetch(`${API_BASE}/comments/${commentId}/replies`);
+    const response = await fetch(`${API_BASE}/comments/${commentId}/replies`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) {
       throw new ApiError("返信の取得に失敗しました", response.status, true);
     }
@@ -316,7 +330,7 @@ export async function createComment(
   try {
     const response = await fetch(`${API_BASE}/posts/${postId}/comments`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ content, parentCommentId }),
     });
     if (!response.ok) {
@@ -341,6 +355,7 @@ export async function toggleCommentUpvote(commentId: string): Promise<UpvoteResp
   try {
     const response = await fetch(`${API_BASE}/comments/${commentId}/upvote`, {
       method: "POST",
+      headers: getAuthHeaders(),
     });
     if (!response.ok) {
       throw new ApiError("投票に失敗しました", response.status, true);

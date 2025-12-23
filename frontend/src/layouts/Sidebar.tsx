@@ -1,7 +1,16 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const Sidebar: React.FC = () => {
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">インサイトブリッジ</div>
@@ -19,16 +28,42 @@ const Sidebar: React.FC = () => {
             </NavLink>
           </li>
 
-          <li className="nav-item">
-            <NavLink
-              to="/conversation-simulation"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
-            >
-              会話シミュレーション
-            </NavLink>
-          </li>
+          {isAuthenticated && (
+            <>
+              <li className="nav-item">
+                <NavLink
+                  to="/conversation-simulation"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                >
+                  会話シミュレーション
+                </NavLink>
+              </li>
+
+              <li className="nav-item">
+                <NavLink
+                  to="/students"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                >
+                  学生リスト
+                </NavLink>
+              </li>
+
+              <li className="nav-item">
+                <NavLink
+                  to="/community"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                >
+                  コミュニティ掲示板
+                </NavLink>
+              </li>
+            </>
+          )}
 
           <li className="nav-item">
             <NavLink
@@ -41,51 +76,63 @@ const Sidebar: React.FC = () => {
             </NavLink>
           </li>
 
-          <li className="nav-item">
-            <NavLink
-              to="/students"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
-            >
-              学生リスト
-            </NavLink>
-          </li>
-
-          <li className="nav-item">
-            <NavLink
-              to="/community"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
-            >
-              コミュニティ掲示板
-            </NavLink>
-          </li>
-
-          <li className="nav-item">
-            <NavLink
-              to="/setting"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
-            >
-              設定
-            </NavLink>
-          </li>
-
           <li className="nav-separator" />
 
-          <li className="nav-item signout">
-            <NavLink
-              to="/logout"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
-            >
-              サインアウト
-            </NavLink>
-          </li>
+          {isAuthenticated ? (
+            <>
+              {user && (
+                <li className="nav-item user-info">
+                  <div className="user-display">
+                    <span className="user-name">{user.username}</span>
+                  </div>
+                </li>
+              )}
+
+              <li className="nav-item">
+                <NavLink
+                  to="/profile"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                >
+                  設定
+                </NavLink>
+              </li>
+
+              <li className="nav-item signout">
+                <button
+                  onClick={handleLogout}
+                  className="nav-link logout-btn"
+                >
+                  サインアウト
+                </button>
+              </li>
+            </>
+          ) : (
+            <>
+              <li className="nav-item">
+                <NavLink
+                  to="/login"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                >
+                  ログイン
+                </NavLink>
+              </li>
+
+              <li className="nav-item">
+                <NavLink
+                  to="/register"
+                  className={({ isActive }) =>
+                    `nav-link ${isActive ? "active" : ""}`
+                  }
+                >
+                  登録
+                </NavLink>
+              </li>
+            </>
+          )}
         </ul>
       </nav>
     </aside>
