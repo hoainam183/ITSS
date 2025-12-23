@@ -15,8 +15,11 @@ class User(Document):
     username: str
     email: EmailStr
     password: str # Đã hash
-    role: str = "teacher"
     profile: UserProfile = Field(default_factory=UserProfile)
+    
+    # Reset password fields
+    reset_token: Optional[str] = Field(None, alias="resetToken")
+    reset_token_expires: Optional[datetime] = Field(None, alias="resetTokenExpires")
     
     last_login: Optional[datetime] = Field(None, alias="lastLogin")
     created_at: datetime = Field(default_factory=datetime.now, alias="createdAt")
