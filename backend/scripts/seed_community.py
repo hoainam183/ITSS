@@ -33,7 +33,7 @@ SEED_USER_DATA = {
     "profile": {
         "full_name": "田中先生",
         "school": "ハノイ日本人学校",
-        "experience": 5,
+        "experience": "5年",  # Changed to string
         "avatar": None,
     }
 }

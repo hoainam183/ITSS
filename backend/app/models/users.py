@@ -1,14 +1,24 @@
-from typing import Optional
+from typing import Optional, Union
 from datetime import datetime
 from beanie import Document
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 # Class con: Profile (Nhúng trong User)
 class UserProfile(BaseModel):
     full_name: Optional[str] = Field(None, alias="fullName")
     school: Optional[str] = None
-    experience: Optional[int] = None # Số năm kinh nghiệm
+    experience: Optional[str] = None # Kinh nghiệm và chuyên ngành (text mô tả)
     avatar: Optional[str] = None
+    
+    @field_validator('experience', mode='before')
+    @classmethod
+    def convert_experience_to_string(cls, v):
+        """Convert int to string for backward compatibility with old data"""
+        if v is None:
+            return None
+        if isinstance(v, int):
+            return str(v)
+        return v
 
 # Collection 1: Users
 class User(Document):

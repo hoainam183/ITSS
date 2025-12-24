@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
+import { useToast } from "../contexts/ToastContext";
 import { resetPassword, AuthApiError } from "../services/authApi";
 
 const ResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
   const { token } = useParams<{ token: string }>();
+  const { showSuccess } = useToast();
   
   const [formData, setFormData] = useState({
     newPassword: "",
@@ -37,8 +39,8 @@ const ResetPasswordPage: React.FC = () => {
       return;
     }
 
-    if (formData.newPassword.length < 6) {
-      setError("パスワードは6文字以上である必要があります");
+    if (formData.newPassword.length < 8) {
+      setError("パスワードは8文字以上である必要があります");
       return;
     }
 
@@ -55,8 +57,10 @@ const ResetPasswordPage: React.FC = () => {
         newPassword: formData.newPassword,
       });
       
-      alert("パスワードがリセットされました！ログインしてください。");
-      navigate("/login");
+      showSuccess("パスワードがリセットされました！ログインしてください。");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (err) {
       if (err instanceof AuthApiError) {
         setError(err.message);
@@ -91,7 +95,7 @@ const ResetPasswordPage: React.FC = () => {
               name="newPassword"
               value={formData.newPassword}
               onChange={handleChange}
-              placeholder="新しいパスワードを入力（6文字以上）"
+              placeholder="新しいパスワードを入力（8文字以上）"
               disabled={isLoading}
               autoComplete="new-password"
               required

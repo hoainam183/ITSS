@@ -72,6 +72,17 @@ const Sidebar: React.FC = () => {
               {user && (
                 <li className="nav-item user-info">
                   <div className="user-display">
+                    {user.profile.avatar && (
+                      <img 
+                        src={user.profile.avatar} 
+                        alt={user.username}
+                        className="user-avatar"
+                        onError={(e) => {
+                          // Hide avatar if image fails to load
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    )}
                     <span className="user-name">{user.username}</span>
                   </div>
                 </li>

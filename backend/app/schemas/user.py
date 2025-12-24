@@ -8,7 +8,7 @@ from beanie import PydanticObjectId
 class UserProfileResponse(BaseModel):
     full_name: Optional[str] = Field(None, alias="fullName")
     school: Optional[str] = None
-    experience: Optional[int] = None
+    experience: Optional[str] = None
     avatar: Optional[str] = None
 
 
@@ -29,5 +29,5 @@ class UserResponse(BaseModel):
 class UserProfileUpdate(BaseModel):
     full_name: Optional[str] = Field(None, alias="fullName")
     school: Optional[str] = None
-    experience: Optional[int] = None
+    experience: Optional[str] = None
     avatar: Optional[str] = None

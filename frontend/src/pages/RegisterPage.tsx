@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useToast } from "../contexts/ToastContext";
 import { AuthApiError } from "../services/authApi";
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { showSuccess } = useToast();
   
   const [formData, setFormData] = useState({
     username: "",
@@ -40,8 +42,8 @@ const RegisterPage: React.FC = () => {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError("パスワードは6文字以上である必要があります");
+    if (formData.password.length < 8) {
+      setError("パスワードは8文字以上である必要があります");
       return;
     }
 
@@ -55,8 +57,11 @@ const RegisterPage: React.FC = () => {
       });
       
       // Show success message and redirect
-      alert("登録が完了しました！ログインしてください。");
-      navigate("/login");
+      console.log("[RegisterPage] Registration successful, showing toast");
+      showSuccess("登録が完了しました！ログインしてください。");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (err) {
       if (err instanceof AuthApiError) {
         setError(err.message);
@@ -116,7 +121,7 @@ const RegisterPage: React.FC = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="パスワードを入力（6文字以上）"
+              placeholder="パスワードを入力（8文字以上）"
               disabled={isLoading}
               required
             />

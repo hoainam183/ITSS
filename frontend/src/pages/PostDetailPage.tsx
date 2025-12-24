@@ -61,6 +61,29 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const [replies, setReplies] = useState<Comment[]>([]);
   const [loadingReplies, setLoadingReplies] = useState(false);
 
+  // Handle upvote for this comment (including replies)
+  const handleUpvote = async (commentId: string) => {
+    try {
+      // Call the parent upvote handler
+      await onUpvote(commentId);
+      
+      // If we're upvoting a reply (it exists in our replies list), reload replies to get updated data
+      // This handles the case when a reply is upvoted - we need to reload the parent's replies
+      if (depth === 0 && showReplies) {
+        // Check if the upvoted comment is in our replies (meaning we're upvoting a reply)
+        const isReply = replies.some(r => r.id === commentId);
+        if (isReply) {
+          // Reload replies to get updated upvote data
+          const response = await fetchReplies(comment.id);
+          setReplies(response.comments);
+        }
+      }
+      // If we're upvoting this comment itself (not a reply), the parent handler will update it
+    } catch {
+      // Silently fail
+    }
+  };
+
   // Load replies when expanding
   const handleShowReplies = async () => {
     if (showReplies) {
@@ -108,7 +131,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
         <div className="comment-vote">
           <button
   className={`vote-btn-sm ${comment.userHasUpvoted ? "voted" : ""}`}
-  onClick={() => onUpvote(comment.id)}
+  onClick={() => handleUpvote(comment.id)}
   title={comment.userHasUpvoted ? "いいねを取り消す" : "いいねする"}
 >
   <FiThumbsUp />
@@ -197,7 +220,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
               key={reply.id}
               comment={reply}
               onReplySubmit={onReplySubmit}
-              onUpvote={onUpvote}
+              onUpvote={handleUpvote}
               depth={1}
             />
           ))}
@@ -290,7 +313,7 @@ const PostDetailPage: React.FC = () => {
     }
   };
 
-  // Handle comment upvote
+  // Handle comment upvote (for both root comments and replies)
   const handleCommentUpvote = async (commentId: string) => {
     // Prevent double-click
     if (upvotingComments.has(commentId)) return;
@@ -298,18 +321,75 @@ const PostDetailPage: React.FC = () => {
     setUpvotingComments((prev) => new Set(prev).add(commentId));
     try {
       const response = await toggleCommentUpvote(commentId);
-      // Update comment in list
+      
+      // Check if it's a root comment or a reply
+      const rootComment = comments.find(c => c.id === commentId);
+      let parentCommentId: string | null = null;
+      
+      if (!rootComment) {
+        // It's a reply, find parent
+        for (const comment of comments) {
+          if (comment.replies && comment.replies.some(r => r.id === commentId)) {
+            parentCommentId = comment.id;
+            break;
+          }
+        }
+      }
+      
+      // Update comment in root comments list
       setComments((prev) =>
-        prev.map((c) =>
-          c.id === commentId
-            ? {
-                ...c,
-                upvotes: response.upvotes,
-                userHasUpvoted: response.userHasUpvoted,
-              }
-            : c
-        )
+        prev.map((c) => {
+          if (c.id === commentId) {
+            return {
+              ...c,
+              upvotes: response.upvotes,
+              userHasUpvoted: response.userHasUpvoted,
+            };
+          }
+          // If this comment has the reply being upvoted, update it
+          if (c.replies && c.replies.some(r => r.id === commentId)) {
+            return {
+              ...c,
+              replies: c.replies.map((reply) =>
+                reply.id === commentId
+                  ? {
+                      ...reply,
+                      upvotes: response.upvotes,
+                      userHasUpvoted: response.userHasUpvoted,
+                    }
+                  : reply
+              ),
+            };
+          }
+          return c;
+        })
       );
+      
+      // If it's a reply, reload the parent's replies to ensure UI is updated
+      // Note: This updates the comments state, but CommentItem's local replies state
+      // will be updated when it reloads or when the component re-renders
+      if (parentCommentId) {
+        // Update the parent comment's replies in state
+        setComments((prev) =>
+          prev.map((c) => {
+            if (c.id === parentCommentId) {
+              // Reload replies for this parent comment
+              fetchReplies(parentCommentId).then((replyResponse) => {
+                setComments((prevComments) =>
+                  prevComments.map((pc) =>
+                    pc.id === parentCommentId
+                      ? { ...pc, replies: replyResponse.comments }
+                      : pc
+                  )
+                );
+              }).catch(() => {
+                // Silently fail
+              });
+            }
+            return c;
+          })
+        );
+      }
     } catch {
       // Silently fail
     } finally {

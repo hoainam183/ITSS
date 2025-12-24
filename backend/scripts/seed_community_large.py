@@ -37,7 +37,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "田中太郎",
             "school": "ハノイ日本人学校",
-            "experience": 5,
+            "experience": "5年",
         }
     },
     {
@@ -48,7 +48,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "山田花子",
             "school": "ハノイ日本人学校",
-            "experience": 3,
+            "experience": "3年",
         }
     },
     {
@@ -59,7 +59,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "鈴木一郎",
             "school": "ベトナム日本語学校",
-            "experience": 7,
+            "experience": "7年",
         }
     },
     {
@@ -70,7 +70,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "佐藤美咲",
             "school": "ハノイ日本人学校",
-            "experience": 2,
+            "experience": "2年",
         }
     },
     {
@@ -81,7 +81,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "渡辺健",
             "school": "ハノイ日本語センター",
-            "experience": 4,
+            "experience": "4年",
         }
     },
     {
@@ -92,7 +92,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "伊藤由美",
             "school": "ハノイ日本人学校",
-            "experience": 6,
+            "experience": "6年",
         }
     },
     {
@@ -103,7 +103,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "小林正",
             "school": "ベトナム日本語学校",
-            "experience": 8,
+            "experience": "8年",
         }
     },
     {
@@ -114,7 +114,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "加藤愛",
             "school": "ハノイ日本人学校",
-            "experience": 1,
+            "experience": "1年",
         }
     },
     {
@@ -125,7 +125,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "吉田雄一",
             "school": "ハノイ日本語センター",
-            "experience": 9,
+            "experience": "9年",
         }
     },
     {
@@ -136,7 +136,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "松本さくら",
             "school": "ハノイ日本人学校",
-            "experience": 3,
+            "experience": "3年",
         }
     },
     {
@@ -147,7 +147,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "井上大輔",
             "school": "ベトナム日本語学校",
-            "experience": 5,
+            "experience": "5年",
         }
     },
     {
@@ -158,7 +158,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "木村麻衣",
             "school": "ハノイ日本人学校",
-            "experience": 4,
+            "experience": "4年",
         }
     },
     {
@@ -169,7 +169,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "林健太",
             "school": "ハノイ日本語センター",
-            "experience": 6,
+            "experience": "6年",
         }
     },
     {
@@ -180,7 +180,7 @@ TEACHER_USERS = [
         "profile": {
             "full_name": "清水優子",
             "school": "ハノイ日本人学校",
-            "experience": 2,
+            "experience": "2年",
         }
     },
 ]
@@ -193,7 +193,7 @@ ADMIN_USER = {
     "profile": {
         "full_name": "管理者",
         "school": "システム管理者",
-        "experience": 10,
+        "experience": "10年",
     }
 }
 
@@ -717,9 +717,9 @@ async def create_comments(posts, users):
             post.comment_count += 1 + num_replies
         
         # Update post's last_activity to latest comment
-        latest_comment = await Comment.find({"postId": post.id}).sort("-createdAt").first()
-        if latest_comment:
-            post.last_activity = latest_comment.created_at
+        latest_comments = await Comment.find({"postId": post.id}).sort("-createdAt").limit(1).to_list()
+        if latest_comments:
+            post.last_activity = latest_comments[0].created_at
         
         await post.save()
     

@@ -76,14 +76,14 @@ async def login(request: LoginRequest):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password"
+            detail="メールアドレスまたはパスワードが正しくありません"
         )
     
     # Verify password
     if not verify_password(request.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password"
+            detail="メールアドレスまたはパスワードが正しくありません"
         )
     
     # Update last login

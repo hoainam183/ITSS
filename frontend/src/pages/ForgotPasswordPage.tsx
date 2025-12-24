@@ -74,8 +74,8 @@ const ForgotPasswordPage: React.FC = () => {
       return;
     }
 
-    if (resetData.newPassword.length < 6) {
-      setError("パスワードは6文字以上である必要があります");
+    if (resetData.newPassword.length < 8) {
+      setError("パスワードは8文字以上である必要があります");
       return;
     }
 
@@ -204,7 +204,7 @@ const ForgotPasswordPage: React.FC = () => {
                   name="newPassword"
                   value={resetData.newPassword}
                   onChange={handleResetChange}
-                  placeholder="新しいパスワードを入力（6文字以上）"
+                  placeholder="新しいパスワードを入力（8文字以上）"
                   disabled={isLoading}
                   autoComplete="new-password"
                   required

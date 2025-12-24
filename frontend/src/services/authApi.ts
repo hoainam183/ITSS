@@ -126,6 +126,40 @@ export function getAuthHeaders(): HeadersInit {
 // ============================================
 
 /**
+ * Helper function to extract error message from FastAPI error response
+ */
+function extractErrorMessage(errorData: any): string {
+  if (!errorData || !errorData.detail) {
+    return "エラーが発生しました";
+  }
+
+  // If detail is an array (validation errors from FastAPI)
+  if (Array.isArray(errorData.detail)) {
+    return errorData.detail
+      .map((err: any) => {
+        if (typeof err === "string") {
+          return err;
+        }
+        if (err.msg) {
+          // Format: "field: message" or just "message"
+          const field = err.loc && err.loc.length > 1 ? err.loc[err.loc.length - 1] : "";
+          return field ? `${field}: ${err.msg}` : err.msg;
+        }
+        return JSON.stringify(err);
+      })
+      .join(", ");
+  }
+
+  // If detail is a string
+  if (typeof errorData.detail === "string") {
+    return errorData.detail;
+  }
+
+  // Fallback
+  return "登録に失敗しました";
+}
+
+/**
  * Register new user
  */
 export async function register(data: RegisterRequest): Promise<RegisterResponse> {
@@ -138,10 +172,8 @@ export async function register(data: RegisterRequest): Promise<RegisterResponse>
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new AuthApiError(
-        errorData.detail || "登録に失敗しました",
-        response.status
-      );
+      const errorMessage = extractErrorMessage(errorData);
+      throw new AuthApiError(errorMessage, response.status);
     }
 
     return response.json();
@@ -164,10 +196,8 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new AuthApiError(
-        errorData.detail || "ログインに失敗しました",
-        response.status
-      );
+      const errorMessage = extractErrorMessage(errorData);
+      throw new AuthApiError(errorMessage || "ログインに失敗しました", response.status);
     }
 
     return response.json();
@@ -221,10 +251,8 @@ export async function updateProfile(data: UpdateProfileRequest): Promise<User> {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new AuthApiError(
-        errorData.detail || "プロフィールの更新に失敗しました",
-        response.status
-      );
+      const errorMessage = extractErrorMessage(errorData);
+      throw new AuthApiError(errorMessage || "プロフィールの更新に失敗しました", response.status);
     }
 
     return response.json();
@@ -247,10 +275,8 @@ export async function forgotPassword(data: ForgotPasswordRequest): Promise<Forgo
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new AuthApiError(
-        errorData.detail || "パスワードリセットリクエストに失敗しました",
-        response.status
-      );
+      const errorMessage = extractErrorMessage(errorData);
+      throw new AuthApiError(errorMessage || "パスワードリセットリクエストに失敗しました", response.status);
     }
 
     return response.json();
@@ -273,10 +299,8 @@ export async function resetPassword(data: ResetPasswordRequest): Promise<ResetPa
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new AuthApiError(
-        errorData.detail || "パスワードのリセットに失敗しました",
-        response.status
-      );
+      const errorMessage = extractErrorMessage(errorData);
+      throw new AuthApiError(errorMessage || "パスワードのリセットに失敗しました", response.status);
     }
 
     return response.json();
