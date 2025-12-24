@@ -2251,7 +2251,7 @@ body {
     border-radius: 0;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .logout-btn:hover {
@@ -2263,9 +2263,11 @@ body {
     background-color: #fecaca;
 }
 
-.logout-btn::before {
-    content: "🚪";
-    font-size: 1.1rem;
+.logout-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    color: currentColor;
 }
 
 /* ============================================

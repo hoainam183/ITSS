@@ -1,0 +1,95 @@
+.home-page {
+  width: 100%;
+}
+
+.welcome-header {
+  font-size: 2.5em;
+  margin-bottom: 30px;
+  color: #2cc275;
+  font-weight: 700;
+  border-bottom: 2px solid #2cc275;
+  padding-bottom: 15px;
+}
+
+.quick-links-section {
+  margin-top: 40px;
+}
+
+.quick-links-title {
+  font-size: 1.5em;
+  margin-bottom: 24px;
+  color: #333;
+  font-weight: 600;
+}
+
+.quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.quick-link-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 32px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 200px;
+  justify-content: center;
+}
+
+.quick-link-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(44, 194, 117, 0.2);
+  border-color: #2cc275;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+}
+
+.quick-link-icon {
+  font-size: 3.5em;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.quick-link-title {
+  font-size: 1.3em;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 12px 0;
+}
+
+.quick-link-description {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .welcome-header {
+    font-size: 2em;
+  }
+
+  .quick-links-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .quick-link-card {
+    padding: 24px 20px;
+    min-height: 180px;
+  }
+
+  .quick-link-icon {
+    font-size: 3em;
+  }
+}
+
