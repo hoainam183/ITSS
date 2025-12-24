@@ -8,10 +8,12 @@ import {
   createComment,
   togglePostUpvote,
   toggleCommentUpvote,
+  deleteComment,
   formatRelativeTime,
   type Post,
   type Comment,
 } from "../services/communityApi";
+import { useAuth } from "../contexts/AuthContext";
 
 // ============================================
 // HELPER: Render content with clickable links
@@ -45,6 +47,9 @@ interface CommentItemProps {
   comment: Comment;
   onReplySubmit: (parentId: string, content: string) => Promise<void>;
   onUpvote: (commentId: string) => Promise<void>;
+  onDelete: (commentId: string) => Promise<void>;
+  currentUserId?: string;
+  currentUserRole?: string;
   depth?: number;
 }
 
@@ -52,6 +57,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
   comment,
   onReplySubmit,
   onUpvote,
+  onDelete,
+  currentUserId,
+  currentUserRole,
   depth = 0,
 }) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
@@ -60,6 +68,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const [showReplies, setShowReplies] = useState(false);
   const [replies, setReplies] = useState<Comment[]>([]);
   const [loadingReplies, setLoadingReplies] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Handle upvote for this comment (including replies)
   const handleUpvote = async (commentId: string) => {
@@ -124,6 +133,25 @@ const CommentItem: React.FC<CommentItemProps> = ({
     }
   };
 
+  // Handle delete
+  const handleDelete = async () => {
+    if (deleting || !window.confirm("このコメントを削除しますか？")) return;
+    
+    setDeleting(true);
+    try {
+      await onDelete(comment.id);
+    } catch {
+      // Handle error
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // Check if current user is the author
+  const isAuthor = currentUserId && comment.author.id === currentUserId;
+  // Check if current user is admin (passed from parent)
+  const isAdmin = currentUserId && currentUserRole === "admin";
+
   return (
     <div className={`comment-item depth-${depth}`}>
       <div className="comment-main">
@@ -132,7 +160,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
           <button
   className={`vote-btn-sm ${comment.userHasUpvoted ? "voted" : ""}`}
   onClick={() => handleUpvote(comment.id)}
-  title={comment.userHasUpvoted ? "いいねを取り消す" : "いいねする"}
+  disabled={comment.isDeleted}
+  title={comment.isDeleted ? "削除されたコメント" : (comment.userHasUpvoted ? "いいねを取り消す" : "いいねする")}
 >
   <FiThumbsUp />
 </button>
@@ -152,12 +181,32 @@ const CommentItem: React.FC<CommentItemProps> = ({
           </div>
 
           <div className="comment-content">
-            {renderWithLinks(comment.content)}
+            {comment.isDeleted ? (
+              <div className="comment-deleted">
+                <em>
+                  {comment.deletedByAdmin 
+                    ? "このコメントは管理者によって削除されました" 
+                    : "このコメントは削除されました"}
+                </em>
+              </div>
+            ) : (
+              renderWithLinks(comment.content)
+            )}
           </div>
 
           <div className="comment-actions">
-            {/* Only show reply button for root comments (depth 0) */}
-            {depth === 0 && (
+            {/* Delete button - show if user is author OR admin, and comment is not deleted */}
+            {(isAuthor || isAdmin) && !comment.isDeleted && (
+              <button
+                className="action-btn delete-btn"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                {deleting ? "削除中..." : "削除"}
+              </button>
+            )}
+            {/* Only show reply button for root comments (depth 0) and if not deleted */}
+            {depth === 0 && !comment.isDeleted && (
               <button
                 className="action-btn"
                 onClick={() => setShowReplyForm(!showReplyForm)}
@@ -166,7 +215,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
               </button>
             )}
 
-            {/* Show replies button */}
+            {/* Show replies button - show even if deleted */}
             {comment.replyCount > 0 && depth === 0 && (
               <button
                 className="action-btn replies-btn"
@@ -181,8 +230,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
             )}
           </div>
 
-          {/* Inline Reply Form */}
-          {showReplyForm && (
+          {/* Inline Reply Form - only show if comment is not deleted */}
+          {showReplyForm && !comment.isDeleted && (
             <form className="reply-form" onSubmit={handleSubmitReply}>
               <textarea
                 className="reply-input"
@@ -221,6 +270,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
               comment={reply}
               onReplySubmit={onReplySubmit}
               onUpvote={handleUpvote}
+              onDelete={onDelete}
+              currentUserId={currentUserId}
+              currentUserRole={currentUserRole}
               depth={1}
             />
           ))}
@@ -236,6 +288,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
 const PostDetailPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Post state
   const [post, setPost] = useState<Post | null>(null);
@@ -433,6 +486,17 @@ const PostDetailPage: React.FC = () => {
     );
   };
 
+  // Handle comment delete
+  const handleCommentDelete = async (commentId: string) => {
+    try {
+      await deleteComment(commentId);
+      // Reload comments to reflect the deletion
+      loadComments();
+    } catch {
+      // Error handling is done in the component
+    }
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -561,6 +625,9 @@ const PostDetailPage: React.FC = () => {
                 comment={comment}
                 onReplySubmit={handleReplySubmit}
                 onUpvote={handleCommentUpvote}
+                onDelete={handleCommentDelete}
+                currentUserId={user?.id}
+                currentUserRole={user?.role}
               />
             ))
           )}

@@ -1735,6 +1735,13 @@ body {
     white-space: pre-wrap;
 }
 
+.comment-deleted {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    font-style: italic;
+    padding: 8px 0;
+}
+
 .comment-actions {
     display: flex;
     gap: 12px;
@@ -1751,6 +1758,20 @@ body {
 
 .action-btn:hover {
     color: #2cc275;
+}
+
+.action-btn.delete-btn {
+    color: #ef4444;
+}
+
+.action-btn.delete-btn:hover {
+    color: #dc2626;
+}
+
+.action-btn.delete-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: #94a3b8;
 }
 
 .replies-btn {
@@ -1852,7 +1873,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #f0fdf4 0%, #e6faed 50%, #d6f2e0 100%);
     padding: 20px;
 }
 
@@ -1862,13 +1883,14 @@ body {
     padding: 40px;
     width: 100%;
     max-width: 450px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 16px rgba(44, 194, 117, 0.15);
+    border: 1px solid #e5e7eb;
 }
 
 .auth-title {
     font-size: 2rem;
     font-weight: 700;
-    color: #333;
+    color: #2cc275;
     margin-bottom: 8px;
     text-align: center;
 }
@@ -1912,8 +1934,8 @@ body {
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #2cc275;
+    box-shadow: 0 0 0 3px rgba(44, 194, 117, 0.15);
 }
 
 .form-group input:disabled,
@@ -1976,7 +1998,7 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #2cc275;
     color: white;
     padding: 12px 24px;
     border: none;
@@ -1988,8 +2010,9 @@ body {
 }
 
 .btn-primary:hover:not(:disabled) {
+    background: #21995c;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(44, 194, 117, 0.4);
 }
 
 .btn-primary:active:not(:disabled) {
@@ -2003,9 +2026,9 @@ body {
 
 .btn-secondary {
     background: white;
-    color: #667eea;
+    color: #2cc275;
     padding: 12px 24px;
-    border: 2px solid #667eea;
+    border: 2px solid #2cc275;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 600;
@@ -2014,7 +2037,7 @@ body {
 }
 
 .btn-secondary:hover:not(:disabled) {
-    background: #f0f4ff;
+    background: #f0fdf4;
 }
 
 .btn-secondary:disabled {
@@ -2029,14 +2052,14 @@ body {
 }
 
 .forgot-password-link {
-    color: #667eea;
+    color: #2cc275;
     font-size: 0.9rem;
     text-decoration: none;
     transition: color 0.2s;
 }
 
 .forgot-password-link:hover {
-    color: #764ba2;
+    color: #21995c;
     text-decoration: underline;
 }
 
@@ -2054,21 +2077,21 @@ body {
 }
 
 .auth-link {
-    color: #667eea;
+    color: #2cc275;
     text-decoration: none;
     font-weight: 600;
     transition: color 0.2s;
 }
 
 .auth-link:hover {
-    color: #764ba2;
+    color: #21995c;
     text-decoration: underline;
 }
 
 .text-button {
     background: none;
     border: none;
-    color: #667eea;
+    color: #2cc275;
     cursor: pointer;
     font-size: 0.95rem;
     padding: 0;
@@ -2078,7 +2101,7 @@ body {
 }
 
 .text-button:hover:not(:disabled) {
-    color: #764ba2;
+    color: #21995c;
     text-decoration: underline;
 }
 

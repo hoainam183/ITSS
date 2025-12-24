@@ -80,6 +80,8 @@ export interface Comment {
   userHasUpvoted: boolean;
   replyCount: number;
   replies: Comment[];
+  isDeleted: boolean;
+  deletedByAdmin: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -361,6 +363,29 @@ export async function toggleCommentUpvote(commentId: string): Promise<UpvoteResp
       throw new ApiError("投票に失敗しました", response.status, true);
     }
     return response.json();
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError("ネットワークエラーが発生しました", 0, true);
+  }
+}
+
+/**
+ * Delete a comment (soft delete)
+ */
+export async function deleteComment(commentId: string): Promise<void> {
+  try {
+    const response = await fetch(`${API_BASE}/comments/${commentId}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new ApiError(
+        errorData.detail || "コメントの削除に失敗しました",
+        response.status,
+        false
+      );
+    }
   } catch (error) {
     if (error instanceof ApiError) throw error;
     throw new ApiError("ネットワークエラーが発生しました", 0, true);

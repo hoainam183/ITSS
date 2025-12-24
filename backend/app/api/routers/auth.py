@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from datetime import datetime, timedelta
 import secrets
+import string
 from app.schemas.auth import (
     RegisterRequest,
     LoginRequest,
@@ -110,8 +111,8 @@ async def forgot_password(request: ForgotPasswordRequest):
         # Don't reveal if email exists or not (security best practice)
         return {"message": "If the email exists, a reset link has been sent"}
     
-    # Generate reset token (random secure string)
-    reset_token = secrets.token_urlsafe(32)
+    # Generate reset token (8-digit alphanumeric)
+    reset_token = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(8))
     
     # Set token expiry (1 hour from now)
     token_expires = datetime.now() + timedelta(hours=1)

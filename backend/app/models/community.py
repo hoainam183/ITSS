@@ -37,6 +37,8 @@ class Comment(Document):
     upvotes: int = 0
     parent_comment_id: Optional[PydanticObjectId] = Field(None, alias="parentCommentId")
     depth: int = 0  # Nesting level (0 = root comment)
+    is_deleted: bool = Field(False, alias="isDeleted")  # Soft delete flag
+    deleted_by_admin: bool = Field(False, alias="deletedByAdmin")  # Flag if deleted by admin
     
     created_at: datetime = Field(default_factory=datetime.now, alias="createdAt")
     updated_at: datetime = Field(default_factory=datetime.now, alias="updatedAt")

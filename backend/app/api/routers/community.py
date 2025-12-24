@@ -517,13 +517,15 @@ async def build_comment_response(
         id=str(comment.id),
         postId=str(comment.post_id),
         author=author,
-        content=comment.content,
+        content=comment.content if not comment.is_deleted else "",  # Empty content if deleted
         upvotes=comment.upvotes,
         parentCommentId=str(comment.parent_comment_id) if comment.parent_comment_id else None,
         depth=comment.depth,
         userHasUpvoted=user_upvote is not None,
         replyCount=reply_count,
         replies=replies,
+        isDeleted=comment.is_deleted,
+        deletedByAdmin=comment.deleted_by_admin,
         createdAt=comment.created_at,
         updatedAt=comment.updated_at,
     )
@@ -703,10 +705,15 @@ async def delete_comment(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Delete a comment (only by author).
-    Also deletes all replies and updates post's comment_count.
+    Soft delete a comment.
+    - Author can delete their own comments
+    - Admin can delete any comment
+    - If deleting root comment: also soft delete all its replies
+    - If deleting reply: only soft delete that reply
+    Marks comment as deleted but keeps it in database for display as "comment deleted".
     """
     current_user_id = current_user.id
+    is_admin = current_user.role == "admin"
     
     try:
         comment = await Comment.get(PydanticObjectId(comment_id))
@@ -716,33 +723,36 @@ async def delete_comment(
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")
     
-    # Check ownership
-    if comment.author_id != current_user_id:
+    # Check ownership (unless admin)
+    if not is_admin and comment.author_id != current_user_id:
         raise HTTPException(status_code=403, detail="You can only delete your own comments")
     
-    # Count this comment + its replies
-    reply_count = await Comment.find({
-        "parentCommentId": comment.id
-    }).count()
-    total_deleted = 1 + reply_count
+    # Check if already deleted
+    if comment.is_deleted:
+        raise HTTPException(status_code=400, detail="Comment is already deleted")
     
-    # Delete replies first
-    await Comment.find({"parentCommentId": comment.id}).delete()
+    # Check if this is a root comment (no parent) or a reply
+    is_root_comment = comment.parent_comment_id is None
     
-    # Delete upvotes for this comment
-    await Upvote.find({
-        "targetType": "comment",
-        "targetId": comment.id
-    }).delete()
+    if is_root_comment:
+        # If deleting root comment: soft delete all replies
+        replies = await Comment.find({
+            "parentCommentId": comment.id,
+            "isDeleted": False  # Only delete replies that aren't already deleted
+        }).to_list()
+        
+        # Soft delete all replies (mark as deleted by admin if admin is deleting)
+        for reply in replies:
+            reply.is_deleted = True
+            reply.deleted_by_admin = is_admin
+            reply.updated_at = datetime.now()
+            await reply.save()
     
-    # Delete the comment
-    await comment.delete()
-    
-    # Update post's comment_count
-    post = await CommunityPost.get(comment.post_id)
-    if post:
-        post.comment_count = max(0, post.comment_count - total_deleted)
-        await post.save()
+    # Soft delete the comment itself
+    comment.is_deleted = True
+    comment.deleted_by_admin = is_admin
+    comment.updated_at = datetime.now()
+    await comment.save()
     
     return None
 

@@ -125,6 +125,8 @@ class CommentResponse(BaseModel):
     user_has_upvoted: bool = Field(False, alias="userHasUpvoted")
     reply_count: int = Field(0, alias="replyCount")  # Number of replies
     replies: List["CommentResponse"] = []  # Only populated when expanded
+    is_deleted: bool = Field(False, alias="isDeleted")  # Soft delete flag
+    deleted_by_admin: bool = Field(False, alias="deletedByAdmin")  # Flag if deleted by admin
     created_at: datetime = Field(alias="createdAt")
     updated_at: datetime = Field(alias="updatedAt")
 
